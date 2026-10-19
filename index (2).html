@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hitz Moviz — Watch Movies</title>
+<style>
+:root{--red:#e50914;--bg:#0b0b0f;--card:#17171e;--muted:#aaa}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#fff;font-family:Arial,Helvetica,sans-serif}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 5%;background:#111;position:sticky;top:0;z-index:5;border-bottom:1px solid #292929}
+.logo{font-size:25px;font-weight:900;color:var(--red);white-space:nowrap}.logo span{color:#fff}
+input,select{background:#222;color:#fff;border:1px solid #393939;border-radius:8px;padding:11px;font-size:15px}
+input{width:min(360px,48vw)}
+.hero{padding:52px 5%;background:linear-gradient(90deg,#17080a,#0b0b0f 75%);border-bottom:1px solid #222}
+.hero h1{font-size:clamp(30px,5vw,52px);margin:0 0 10px}.hero p{color:#ccc;max-width:620px;line-height:1.6}
+.tag{display:inline-block;background:var(--red);padding:7px 12px;border-radius:5px;font-weight:bold;font-size:12px}
+main{padding:26px 5%}.filters{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:18px}
+.movie{background:var(--card);border-radius:10px;overflow:hidden;border:1px solid #292932;cursor:pointer;transition:transform .2s}
+.movie:hover{transform:translateY(-4px)}.poster{height:220px;display:flex;align-items:center;justify-content:center;text-align:center;padding:15px;background:linear-gradient(145deg,#4b1118,#17171e 75%);font-size:21px;font-weight:800}
+.movie h3{font-size:15px;margin:12px 12px 5px}.movie p{font-size:12px;color:var(--muted);margin:0 12px 14px}
+button{background:var(--red);border:0;color:#fff;border-radius:7px;padding:11px 15px;font-weight:bold;cursor:pointer}
+.player{display:none;background:#14141a;border:1px solid #30303a;border-radius:12px;padding:16px;margin:20px 0 28px}
+.player video{width:100%;max-height:65vh;background:#000;border-radius:8px}.player h2{margin:8px 0 14px}
+.notice{color:#bbb;font-size:13px;line-height:1.6}footer{padding:25px 5%;margin-top:40px;border-top:1px solid #292929;color:#aaa;font-size:13px}
+@media(max-width:520px){header{padding:14px 4%;flex-wrap:wrap}.logo{font-size:22px}input{width:100%}.hero{padding:35px 4%}main{padding:22px 4%}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.poster{height:190px}}
+</style>
+</head>
+<body>
+<header><div class="logo">HITZ <span>MOVIZ</span></div><input id="search" type="search" placeholder="Search movies..." aria-label="Search movies"></header>
+<section class="hero"><span class="tag">YOUR MOVIE HUB</span><h1>Stories worth watching.</h1><p>Discover movies, explore categories, and watch videos online. New titles can be added by editing the movie list in this page's code.</p></section>
+<main>
+<h2>Watch Online</h2>
+<div class="filters"><select id="category" aria-label="Filter by category"><option value="All">All categories</option><option>Action</option><option>Drama</option><option>Comedy</option><option>Documentary</option></select></div>
+<section class="player" id="player"><h2 id="playingTitle">Now playing</h2><video id="video" controls playsinline preload="metadata"></video><p class="notice">Only play videos you own or are authorized to distribute. Replace the demo video URL in the code with your permitted video file URL.</p></section>
+<div class="grid" id="grid"></div>
+</main>
+<footer>© <span id="year"></span> Hitz Moviz. All rights reserved.<br>Use only original, licensed, or public-domain videos. This demo does not include movie files or a payment system.</footer>
+<script>
+const movies = [
+ {title:"Sample Action Film",category:"Action",year:"Demo",video:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"},
+ {title:"Sample Drama",category:"Drama",year:"Demo",video:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"},
+ {title:"Sample Comedy",category:"Comedy",year:"Demo",video:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"},
+ {title:"Sample Documentary",category:"Documentary",year:"Demo",video:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"}
+];
+const grid=document.getElementById("grid"),search=document.getElementById("search"),category=document.getElementById("category");
+function render(){
+ const q=search.value.trim().toLowerCase(), c=category.value;
+ const filtered=movies.filter(m=>m.title.toLowerCase().includes(q)&&(c==="All"||m.category===c));
+ grid.innerHTML="";
+ if(!filtered.length){grid.innerHTML="<p>No videos found. Try another search.</p>";return}
+ filtered.forEach(m=>{
+  const card=document.createElement("article");card.className="movie";
+  const poster=document.createElement("div");poster.className="poster";poster.textContent=m.title;
+  const title=document.createElement("h3");title.textContent=m.title;
+  const meta=document.createElement("p");meta.textContent=m.category+" • "+m.year;
+  const btn=document.createElement("button");btn.textContent="▶ Watch";
+  btn.style.margin="0 12px 14px";btn.onclick=()=>playMovie(m);
+  card.append(poster,title,meta,btn);grid.append(card);
+ });
+}
+function playMovie(m){
+ const p=document.getElementById("player"),v=document.getElementById("video");
+ document.getElementById("playingTitle").textContent=m.title;
+ v.src=m.video;p.style.display="block";p.scrollIntoView({behavior:"smooth",block:"start"});
+ v.play().catch(()=>{});
+}
+search.addEventListener("input",render);category.addEventListener("change",render);
+document.getElementById("year").textContent=new Date().getFullYear();render();
+</script>
+</body>
+</html>
